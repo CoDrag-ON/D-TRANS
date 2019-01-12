@@ -1,6 +1,20 @@
-const Block = require('./bloackchain/block');
+const BlockChain = require('./blockchain/blockchain');
 
 
-let block = new Block("shdfkjhkdf", "0", Date.now())
+let coin = new BlockChain();
 
-console.log(block)
+coin.addBlock({
+   "from": "sam",
+   "to": "sai",
+   "amount": 500
+})
+
+coin.addBlock({
+   "from": "sai",
+   "to": "sam",
+   "amount": 5000
+})
+
+// console.log(JSON.stringify(chain, null, 2))
+
+console.log(BlockChain.validateChain(coin))
