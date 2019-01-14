@@ -10,12 +10,14 @@ class Block {
    }
 
    static mineBlock(prevBlock, data) {
-      const hash = Block.calculateHash(data, prevBlock.prev_hash, Date.now())
-      return new this(data, prevBlock.hash, hash, Date.now);
+      const timeStamp = Date.now();
+      const hash = Block.calculateHash(data, prevBlock.prev_hash, timeStamp)
+      return new Block(data, prevBlock.hash, hash, Date.now);
    }
 
    static createGensisBlock() {
-      return new this("0", "0", Date.now())
+
+      return new Block([], 0, 0, "Gensis time")
    }
 
    static calculateHash(data, prev_hash, timestamp) {
@@ -23,7 +25,7 @@ class Block {
    }
 
    static HashBlock(block) {
-      return SHA256(block.data + block.prev_hash + block.timestamp).toString();
+      return this.calculateHash(block.data + block.prev_hash + block.timestamp).toString();
 
    }
 }
