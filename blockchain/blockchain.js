@@ -59,6 +59,7 @@ class Blockchain {
 
 
       this.chain = _chain;
+      console.log("Replacing chain")
       return {
          sucess: true,
          msg: "Replaceing chain"
