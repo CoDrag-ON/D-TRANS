@@ -14,7 +14,6 @@ class Block {
    static mineBlock(prevBlock, data) {
         let nonce = 0;
         let timestamp, hash, difficulty;
-        console.log("mining bolck")
 
         do{
             nonce++;
@@ -23,7 +22,6 @@ class Block {
             hash = Block.calculateHash(data, prevBlock.prev_hash, timestamp, nonce, difficulty)
 
         }while(hash.substring(0, difficulty) !== "0".repeat(difficulty))
-        console.log("mining completed")
          
         return new Block(data, prevBlock.hash, hash, Date.now, nonce, difficulty);
    }
