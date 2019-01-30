@@ -1,6 +1,9 @@
 const express = require('express');
 const BlockChain = require('./blockchain/blockchain');
 const p2p = require('./p2p');
+const Wallet = require('./wallet');
+const TransactionPool = require('./wallet/transactionPool')
+const Miner = require('./minner');
 
 const HTTP_PORT = process.env.HTTP_PORT || 3001;
 
@@ -9,12 +12,36 @@ const app = express();
 app.use(express.json());
 
 let chain = new BlockChain();
+const wallet = new Wallet();
+const tp = new TransactionPool();
 
-const p2pServer = new p2p(chain);
+const p2pServer = new p2p(chain, tp);
+
+const miner = new Miner(chain, tp, wallet, p2pServer);
 
 app.get('/blocks', (req, res) => {
   res.json(chain);
 });
+
+app.get('/transaction', (req, res) => {
+  res.json(tp.transactions)
+});
+
+app.post('/transact', (req, res) => {
+  const {
+    recipient,
+    amount
+  } = req.body;
+  const transaction = wallet.createTransaction(recipient, amount, chain, tp)
+  p2pServer.broadcastTransaction(transaction)
+  res.redirect('/transaction')
+});
+
+app.get('/mine-transactions', (req, res) => {
+  const block = miner.mine();
+  console.log(`new block added `)
+  res.redirect('/blocks')
+})
 
 app.post('/mine', (req, res) => {
   chain.addBlock(req.body);
@@ -22,6 +49,12 @@ app.post('/mine', (req, res) => {
 
   p2pServer.syncChain();
 });
+
+app.get('/public-key', (req, res) => {
+  res.json({
+    publicKey: wallet.publicKey
+  })
+})
 
 // app.use('/block', block)
 
