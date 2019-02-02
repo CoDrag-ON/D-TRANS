@@ -3,7 +3,7 @@ const BlockChain = require('./blockchain/blockchain');
 const p2p = require('./p2p');
 const Wallet = require('./wallet');
 const TransactionPool = require('./wallet/transactionPool')
-const Miner = require('./minner');
+const Miner = require('./miner');
 
 const HTTP_PORT = process.env.HTTP_PORT || 3001;
 
@@ -53,6 +53,12 @@ app.post('/mine', (req, res) => {
 app.get('/public-key', (req, res) => {
   res.json({
     publicKey: wallet.publicKey
+  })
+})
+
+app.get('/balance', (req, res) => {
+  res.json({
+    Balance: wallet.calculateWalletBalance(chain)
   })
 })
 
