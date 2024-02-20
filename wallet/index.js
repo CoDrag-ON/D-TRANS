@@ -1,13 +1,13 @@
-const { INITIAL_BALANCE } = require('../config');
+const { INITIAL_BALANCE } = require("../config");
 
-const Utility = require('../Utility');
-const Transaction = require('./transactions');
+const Utility = require("../Utility");
+const Transaction = require("./transactions");
 
 class Wallet {
   constructor() {
     this.balance = INITIAL_BALANCE;
     this.keyPair = Utility.genrateKeyPair();
-    this.publicKey = this.keyPair.getPublic().encode('hex');
+    this.publicKey = this.keyPair.getPublic().encode("hex");
   }
 
   toString() {
@@ -25,7 +25,7 @@ class Wallet {
     console.log(`createTransaction: ${this.balance}`);
 
     if (amount > this.balance) {
-      console.log('Amount exceeds');
+      console.log("Amount exceeds");
       return;
     }
 
@@ -43,14 +43,14 @@ class Wallet {
   calculateWalletBalance(blockchain) {
     let balance = this.balance;
     let transactions = [];
-    blockchain.chain.forEach(block =>
-      block.data.forEach(transaction => {
+    blockchain.chain.forEach((block) =>
+      block.data.forEach((transaction) => {
         transactions.push(transaction);
       })
     );
 
     const walletInputTs = transactions.filter(
-      transaction => transaction.inputs.address === this.publicKey
+      (transaction) => transaction.inputs.address === this.publicKey
     );
     let startTime = 0;
 
@@ -60,15 +60,15 @@ class Wallet {
       );
 
       balance = recentInputT.outputs.find(
-        output => output.address === this.publicKey
+        (output) => output.address === this.publicKey
       ).amount;
 
       startTime = recentInputT.inputs.timestamp;
     }
 
-    transactions.forEach(transaction => {
+    transactions.forEach((transaction) => {
       if (transaction.inputs.timestamp > startTime) {
-        transaction.outputs.find(output => {
+        transaction.outputs.find((output) => {
           if (output.address === this.publicKey) {
             balance += output.amount;
             console.log(`Balance : ${balance}`);
@@ -82,7 +82,7 @@ class Wallet {
 
   static blockchainWallet() {
     const blockchainWallet = new this();
-    blockchainWallet.address = 'blockchain-wallet';
+    blockchainWallet.address = "blockchain-wallet";
     return blockchainWallet;
   }
 }

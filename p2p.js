@@ -1,13 +1,13 @@
-const Websocket = require('ws');
+const Websocket = require("ws");
 
 const P2P_PORT = process.env.P2P_PORT || 5001;
-const peers = process.env.PEERS ? process.env.PEERS.split(',') : [];
+const peers = process.env.PEERS ? process.env.PEERS.split(",") : [];
 
 const MESSAGE_TYPES = {
-  chain: 'CHAIN',
-  transaction: 'TRANSACTION',
-  clear_transactions: 'CLEAR_TRANSACTION'
-}
+  chain: "CHAIN",
+  transaction: "TRANSACTION",
+  clear_transactions: "CLEAR_TRANSACTION",
+};
 
 class p2pServer {
   constructor(blockchain, transactionPool) {
@@ -18,30 +18,30 @@ class p2pServer {
 
   listen() {
     const server = new Websocket.Server({
-      port: P2P_PORT
+      port: P2P_PORT,
     });
-    server.on('connection', socket => this.connectSocket(socket));
+    server.on("connection", (socket) => this.connectSocket(socket));
 
     this.connectToPeers();
     console.log(`Socket connected peer-peer on port ${P2P_PORT}`);
   }
 
   connectToPeers() {
-    peers.forEach(peer => {
+    peers.forEach((peer) => {
       const socket = new Websocket(peer);
-      socket.on('open', () => this.connectSocket(socket));
+      socket.on("open", () => this.connectSocket(socket));
     });
   }
 
   connectSocket(socket) {
     this.sockets.push(socket);
-    console.log('Socket connected');
+    console.log("Socket connected");
     this.messageHandler(socket);
     this.sendChain(socket);
   }
 
   messageHandler(socket) {
-    socket.on('message', message => {
+    socket.on("message", (message) => {
       const data = JSON.parse(message);
 
       switch (data.type) {
@@ -56,39 +56,46 @@ class p2pServer {
           this.transactionPool.clear();
           break;
       }
-
     });
   }
 
   sendChain(socket) {
-    socket.send(JSON.stringify({
-      type: MESSAGE_TYPES.chain,
-      chain: this.blockchain.chain
-    }));
+    socket.send(
+      JSON.stringify({
+        type: MESSAGE_TYPES.chain,
+        chain: this.blockchain.chain,
+      })
+    );
   }
   sendTransaction(socket, transaction) {
-    socket.send(JSON.stringify({
-      type: MESSAGE_TYPES.transaction,
-      transaction
-    }))
+    socket.send(
+      JSON.stringify({
+        type: MESSAGE_TYPES.transaction,
+        transaction,
+      })
+    );
   }
 
   syncChain() {
-    this.sockets.forEach(socket => {
+    this.sockets.forEach((socket) => {
       this.sendChain(socket);
     });
   }
 
   broadcastTransaction(transaction) {
-    this.sockets.forEach(socket => {
-      this.sendTransaction(socket, transaction)
-    })
+    this.sockets.forEach((socket) => {
+      this.sendTransaction(socket, transaction);
+    });
   }
 
   broadcastClearTransaction() {
-    this.sockets.forEach(socket => socket.send(JSON.stringify({
-      type: MESSAGE_TYPES.clear_transactions
-    })))
+    this.sockets.forEach((socket) =>
+      socket.send(
+        JSON.stringify({
+          type: MESSAGE_TYPES.clear_transactions,
+        })
+      )
+    );
   }
 }
 
