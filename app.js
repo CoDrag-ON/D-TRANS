@@ -43,7 +43,7 @@ app.get("/mine-transactions", (req, res) => {
 
 app.post("/mine", (req, res) => {
   chain.addBlock(req.body);
-  res.send("transaction done sucessfully");
+  res.send("transaction done successfully");
 
   p2pServer.syncChain();
 });

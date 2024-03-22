@@ -1,6 +1,6 @@
 const EC = require("elliptic").ec;
 const SHA256 = require("crypto-js/sha256");
-const uuidV1 = require("uuid/v1");
+const { v4: uuidv4 } = require('uuid');
 
 const ec = new EC("secp256k1");
 
@@ -10,7 +10,7 @@ class Utility {
   }
 
   static genrateId() {
-    return uuidV1();
+    return uuidv4();
   }
 
   static hash(data) {
